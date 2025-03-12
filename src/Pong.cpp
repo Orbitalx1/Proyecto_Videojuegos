@@ -1,5 +1,6 @@
 #include <GL/glut.h>
 #include <math.h>
+#include <stdio.h>
 
 // Dimensiones
 const int Ancho = 800;
@@ -67,8 +68,24 @@ void update(int value) {
         PelotitaDirY = -PelotitaDirY; 
     }
 
+     // Colisión con paleta izquierda
+     if (PelotitaX < -0.85f && PelotitaX > -0.9f && 
+        PelotitaY < jugador1 + 0.2f && PelotitaY > jugador1 - 0.2f) {
+        PelotitaDirX = -PelotitaDirX; 
+    }
+
+    // Colisión con paleta derecha
+    if (PelotitaX > 0.85f && PelotitaX < 0.9f &&
+        PelotitaY < jugador2 + 0.2f && PelotitaY > jugador2 - 0.2f) {
+        PelotitaDirX = -PelotitaDirX;
+    }
+
     // Reiniciar pelota si sale por los lados
-    if (PelotitaX > 1.0f || PelotitaX < -1.0f) {
+    if (PelotitaX > 1.0f) {
+        PelotitaX = 0.0f;
+        PelotitaY = 0.0f; 
+    }
+    if (PelotitaX < -1.0f) {
         PelotitaX = 0.0f;
         PelotitaY = 0.0f; 
     }
@@ -110,5 +127,5 @@ int main(int argc, char** argv) {
     glutKeyboardFunc(keyboard);
     glutTimerFunc(0, update, 0); 
     glutMainLoop();
-    return 0;
+    return 0;
 }
