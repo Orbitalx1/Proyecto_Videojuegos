@@ -1,13 +1,28 @@
 #include <GL/glut.h>
+#include <math.h>
 
 // Dimensiones
-const int Ancho = 600;
-const int Altura = 400;
+const int Ancho = 800;
+const int Altura = 600;
 
 // Posiciones de jugadores y pelota inicio
 float jugador1 = 0.0f;
-float jugador2 = 0.0f; 
+float jugador2 = 0.0f;
 float PelotitaX = 0.0f, PelotitaY = 0.0f;
+float PelotitaDirX = 0.01f, PelotitaDirY = 0.01f; 
+
+#define PI 3.1415926535898
+GLint circle_points = 100;
+
+// Función para dibujar un círculo
+void MyCircle2f(GLfloat centerx, GLfloat centery, GLfloat radius) {
+    glBegin(GL_POLYGON);
+    for (int i = 0; i < circle_points; i++) {
+        float angle = 2.0f * PI * i / circle_points;
+        glVertex2f(centerx + radius * cos(angle), centery + radius * sin(angle));
+    }
+    glEnd();
+}
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -34,17 +49,32 @@ void display() {
     glEnd();
     glPopMatrix();
 
-    // Dibujar pelota
+    // Dibujar pelota (círculo)
     glPushMatrix();
     glTranslatef(PelotitaX, PelotitaY, 0.0f);
-    glBegin(GL_QUADS);
-        glVertex2f(-0.05f, 0.05f);
-        glVertex2f(0.05f, 0.05f);
-        glVertex2f(0.05f, -0.05f);
-        glVertex2f(-0.05f, -0.05f);
-    glEnd();
+    glColor3f(1.0f, 0.0f, 0.0f); // Color rojo
+    MyCircle2f(0.0f, 0.0f, 0.05f); // Dibujar círculo de radio 0.05
     glPopMatrix();
     glutSwapBuffers();
+}
+
+void update(int value) {
+    PelotitaX += PelotitaDirX;
+    PelotitaY += PelotitaDirY;
+
+    // Colisión con los bordes superior e inferior
+    if (PelotitaY > 1.0f || PelotitaY < -1.0f) {
+        PelotitaDirY = -PelotitaDirY; 
+    }
+
+    // Reiniciar pelota si sale por los lados
+    if (PelotitaX > 1.0f || PelotitaX < -1.0f) {
+        PelotitaX = 0.0f;
+        PelotitaY = 0.0f; 
+    }
+
+    glutPostRedisplay();
+    glutTimerFunc(16, update, 0);
 }
 
 void keyboard(unsigned char key, int x, int y) {
@@ -77,7 +107,8 @@ int main(int argc, char** argv) {
     
     init();
     glutDisplayFunc(display);
-    glutKeyboardFunc(keyboard); // Habilitar el manejo del teclado
+    glutKeyboardFunc(keyboard);
+    glutTimerFunc(0, update, 0); 
     glutMainLoop();
-    return 0;
+    return 0;
 }
