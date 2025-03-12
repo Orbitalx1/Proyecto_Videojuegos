@@ -11,6 +11,8 @@ float jugador1 = 0.0f;
 float jugador2 = 0.0f;
 float PelotitaX = 0.0f, PelotitaY = 0.0f;
 float PelotitaDirX = 0.01f, PelotitaDirY = 0.01f; 
+int marcador1;
+int marcador2;
 
 #define PI 3.1415926535898
 GLint circle_points = 100;
@@ -25,12 +27,21 @@ void MyCircle2f(GLfloat centerx, GLfloat centery, GLfloat radius) {
     glEnd();
 }
 
+// Función para mostrar el marcador
+void Escribir(const char *text, float x, float y) {
+    glRasterPos2f(x, y);
+    while (*text) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, *text++);
+    }
+}
+
 void display() {
     glClear(GL_COLOR_BUFFER_BIT);
     
     // Porteria izquierda, Jugador Izquierda
     glPushMatrix();
     glTranslatef(-0.9f, jugador1, 0.0f);
+    glColor3f(0.0f, 0.0f, 1.0f);
     glBegin(GL_QUADS);
         glVertex2f(-0.05f, 0.2f);
         glVertex2f(0.05f, 0.2f);
@@ -42,6 +53,7 @@ void display() {
     // Porteria derecha, Jugador Derecha
     glPushMatrix();
     glTranslatef(0.9f, jugador2, 0.0f);
+    glColor3f(1.0f, 0.0f, 0.0f); // Rojo
     glBegin(GL_QUADS);
         glVertex2f(-0.05f, 0.2f);
         glVertex2f(0.05f, 0.2f);
@@ -53,9 +65,16 @@ void display() {
     // Dibujar pelota (círculo)
     glPushMatrix();
     glTranslatef(PelotitaX, PelotitaY, 0.0f);
-    glColor3f(1.0f, 0.0f, 0.0f); // Color rojo
-    MyCircle2f(0.0f, 0.0f, 0.05f); // Dibujar círculo de radio 0.05
+    glColor3f(1.0f, 1.0f, 1.0f);
+    MyCircle2f(0.0f, 0.0f, 0.05f);
     glPopMatrix();
+
+    // Mostrar marcador
+    glColor3f(1.0f, 1.0f, 1.0f);
+    char buffer[50];
+    sprintf(buffer, " Messi: %d | Cristiano: %d", marcador1, marcador2);
+    Escribir(buffer, -0.2f, 0.9f);
+
     glutSwapBuffers();
 }
 
@@ -80,14 +99,16 @@ void update(int value) {
         PelotitaDirX = -PelotitaDirX;
     }
 
-    // Reiniciar pelota si sale por los lados
+    // Reiniciar pelota si sale por los lados y ademas sumar al marcador.
     if (PelotitaX > 1.0f) {
         PelotitaX = 0.0f;
         PelotitaY = 0.0f; 
+        marcador1++;
     }
     if (PelotitaX < -1.0f) {
         PelotitaX = 0.0f;
         PelotitaY = 0.0f; 
+        marcador2;
     }
 
     glutPostRedisplay();
@@ -113,7 +134,7 @@ void keyboard(unsigned char key, int x, int y) {
 }
 
 void init() {
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.0,0.8,0.0,1.0);
 }
 
 int main(int argc, char** argv) {
@@ -127,5 +148,5 @@ int main(int argc, char** argv) {
     glutKeyboardFunc(keyboard);
     glutTimerFunc(0, update, 0); 
     glutMainLoop();
-    return 0;
+    return 0;
 }
